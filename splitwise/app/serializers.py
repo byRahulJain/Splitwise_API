@@ -1,18 +1,17 @@
 from rest_framework import serializers
-from .models import UserProfile, Expense, ExpenseParticipant
-from rest_framework.fields import ChoiceField
+from .models import Expense, UserProfile
 
-# created for list of dictionaries in input
 class ParticipantSerializer(serializers.Serializer):
     username = serializers.CharField()
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+
 
 class ExpenseSerializer(serializers.ModelSerializer):
     participants = ParticipantSerializer(many=True, required=False)
 
     class Meta:
         model = Expense
-        fields = '__all__'
+        fields = ('id','type', 'amount', 'paid_by','participants')
 
     #custom validations for amount
     def validate(self,data):
@@ -35,16 +34,13 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
         return data
 
-class ExpenseParticipantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ExpenseParticipant
-        fields = '__all__'
-
-# To diplay each user balance
-class UserBalanceSerializer(serializers.Serializer):
+class UserBalanceSerializer(serializers.ModelSerializer):
     user = serializers.CharField()
-    amount_owed = serializers.DecimalField(max_digits=10, decimal_places=2)
-    amount_get = serializers.DecimalField(max_digits=10, decimal_places=2)
-    net_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    owes_to = serializers.ReadOnlyField()
+    gets_from = serializers.ReadOnlyField()
+    net_balance = serializers.ReadOnlyField()
 
-    
+    class Meta:
+         model = UserProfile
+         fields = ['user', 'owes_to', 'gets_from','net_balance']
+
