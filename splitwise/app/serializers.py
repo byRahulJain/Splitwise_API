@@ -44,3 +44,10 @@ class UserBalanceSerializer(serializers.ModelSerializer):
          model = UserProfile
          fields = ['user', 'owes_to', 'gets_from','net_balance']
 
+class SimplifiedBalanceSerializer(serializers.ModelSerializer):
+    user = serializers.CharField()
+    net_balance = serializers.ReadOnlyField()
+
+    class Meta:
+         model = UserProfile
+         fields = ['user','net_balance']

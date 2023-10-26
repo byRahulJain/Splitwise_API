@@ -59,3 +59,25 @@ class ExpenseService:
                 ExpenseParticipant.objects.create(expense=expense, user=user,amount=per_user)
 
 
+class SimplifiedBalanceService:
+    
+    def simplify(self,balances):
+
+        transactions = []
+        positives = [user for user, balance in balances.items() if balance > 0]
+        negatives = [user for user, balance in balances.items() if balance < 0]
+
+        while positives and negatives:
+            payer = positives[0]
+            payee = negatives[0]
+            amount = min(balances[payer], -balances[payee])
+            transactions.append((payer, payee, amount))
+            balances[payer] -= amount
+            balances[payee] += amount
+
+            if balances[payer] == 0:
+                positives.pop(0)
+            if balances[payee] == 0:
+                negatives.pop(0)
+
+        return transactions
